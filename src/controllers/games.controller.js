@@ -4,12 +4,12 @@ export async function createGame(req, res) {
   const { name, image, stockTotal, pricePerDay } = req.body;
 
   try {
-    const game = await db.query(
+    const result = await db.query(
       `
         SELECT * from games WHERE name = $1;`,
       [name]
     );
-    if (game.rowCount > 0)
+    if (result.rowCount > 0)
       return res.status(409).send({ message: "Jogo já cadastrado!" });
 
     await db.query(

@@ -1,4 +1,4 @@
-export function validateGamesSchemas(schema) {
+export function validateGameSchema(schema) {
   return (req, res, next) => {
     const validation = schema.validate(req.body, {
       abortEarly: false,
