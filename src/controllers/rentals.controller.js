@@ -106,7 +106,55 @@ export async function getRentals(req, res) {
 
       rentals.push(rental);
     });
+
     return res.send(rentals);
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).send(err.message);
+  }
+}
+
+export async function concludeRental(req, res) {
+  const { id } = req.params;
+  try {
+    const result = await db.query(
+      `SELECT rentals."daysRented", rentals."delayFee", 
+        games."pricePerDay" AS "gamePrice",
+        TO_CHAR("rentDate", 'YYYY-MM-DD') AS "rentDate",
+        TO_CHAR("returnDate", 'YYYY-MM-DD') AS "returnDate"
+        FROM rentals
+        JOIN games ON rentals."gameId" = games.id
+        WHERE rentals.id = $1;`,
+      [id]
+    );
+
+    if (result.rowCount === 0)
+      return res.status(404).send({
+        message: "O aluguel com id fornecido não existe!",
+      });
+
+    const rental = result.rows[0];
+
+    if (rental.returnDate !== null)
+      return res.status(400).send({
+        message: "O aluguel com id fornecido já foi finalizado!",
+      });
+
+    const now = Date.now();
+    const formattedNow = dayjs(now).format("YYYY-MM-DD");
+    const deliveryDate = dayjs(rental.rentDate).add(rental.daysRented, "day");
+    const delayInDays = deliveryDate.diff(formattedNow, "day");
+    let delayFee = 0;
+    if (delayInDays < 0) delayFee = Math.abs(delayInDays) * rental.gamePrice;
+
+    await db.query(
+      `UPDATE rentals
+        SET "returnDate" = $2, "delayFee" = $3
+        WHERE id = $1;`,
+      [id, formattedNow, delayFee]
+    );
+
+    return res.sendStatus(200);
   } catch (err) {
     console.log(err.message);
     return res.status(500).send(err.message);
