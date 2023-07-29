@@ -14,7 +14,6 @@ export async function createCustomer(req, res) {
 
     await db.query(
       `INSERT INTO customers (name, phone, cpf, birthday)
-        TO_CHAR(birthday, 'YYYY-MM-DD')
         VALUES ($1, $2, $3, $4);`,
       [name, phone, cpf, birthday]
     );
