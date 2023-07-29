@@ -49,7 +49,7 @@ export async function getCustomerById(req, res) {
 
     if (result.rowCount === 0) res.sendStatus(404);
 
-    res.send(result.rows);
+    res.send(result.rows[0]);
   } catch (err) {
     console.log(err.message);
     return res.status(500).send(err.message);

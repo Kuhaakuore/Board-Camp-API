@@ -14,7 +14,7 @@ export function validateRentalSchema(schema) {
           message += "Id do usuário inválido (campo obrigatório)!\n";
         if (error.includes("gameId"))
           message += "Id do jogo inválido (campo obrigatório)!\n";
-        if (error.message.includes("daysRented"))
+        if (error.includes("daysRented"))
           message +=
             "Quantidade de dias para locação inválido (campo obrigatório com valor mínimo de 1 dia)!\n ";
       });
