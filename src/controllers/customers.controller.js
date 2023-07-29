@@ -29,9 +29,27 @@ export async function createCustomer(req, res) {
 export async function getCustomers(req, res) {
   try {
     const customers = await db.query(
-      `SELECT name, phone, cpf, TO_CHAR(birthday, 'YYYY-MM-DD') AS birthday from customers;`
+      `SELECT id, name, phone, cpf, TO_CHAR(birthday, 'YYYY-MM-DD') AS birthday from customers;`
     );
     res.send(customers.rows);
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).send(err.message);
+  }
+}
+
+export async function getCustomerById(req, res) {
+  const {id} = req.params;
+
+  try {
+    const result = await db.query(
+      `SELECT id, name, phone, cpf, TO_CHAR(birthday, 'YYYY-MM-DD') AS birthday from customers
+       WHERE id = $1;`, [id]
+    );
+
+    if (result.rowCount === 0) res.sendStatus(404);
+
+    res.send(result.rows);
   } catch (err) {
     console.log(err.message);
     return res.status(500).send(err.message);
