@@ -160,3 +160,40 @@ export async function concludeRental(req, res) {
     return res.status(500).send(err.message);
   }
 }
+
+export async function deleteRental(req, res) {
+  const { id } = req.params;
+  
+  try {
+    const result = await db.query(
+      `SELECT rentals."returnDate", 
+        TO_CHAR("returnDate", 'YYYY-MM-DD') AS "returnDate"
+        FROM rentals
+        WHERE rentals.id = $1;`,
+      [id]
+    );
+
+    if (result.rowCount === 0)
+      return res.status(404).send({
+        message: "O aluguel com id fornecido não existe!",
+      });
+
+    const rental = result.rows[0];
+
+    if (rental.returnDate === null)
+      return res.status(400).send({
+        message: "O aluguel com id fornecido ainda não foi finalizado!",
+      });
+
+    await db.query(
+      `DELETE FROM rentals
+        WHERE id = $1;`,
+      [id]
+    );
+
+    return res.sendStatus(200);
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).send(err.message);
+  }
+}
