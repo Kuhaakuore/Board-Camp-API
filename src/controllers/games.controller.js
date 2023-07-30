@@ -26,9 +26,19 @@ export async function createGame(req, res) {
 }
 
 export async function getGames(req, res) {
+  const { name } = req.query;
   try {
+
+    if (name) {
+      console.log(name);
+      const games = await db.query(
+        `SELECT * FROM games WHERE name ILIKE '${name}%';`
+      );
+      return res.send(games.rows);
+    }
+
     const games = await db.query(`SELECT * from games;`);
-    res.send(games.rows);
+    return res.send(games.rows);
   } catch (err) {
     console.log(err.message);
     return res.status(500).send(err.message);

@@ -56,6 +56,8 @@ export async function createRental(req, res) {
 }
 
 export async function getRentals(req, res) {
+  const { customerId, gameId } = req.query;
+
   try {
     const result = await db.query(`
     SELECT rentals.id, rentals."customerId", rentals."gameId", 
@@ -69,6 +71,92 @@ export async function getRentals(req, res) {
     `);
 
     const rentals = [];
+
+    if (customerId) {
+      result.rows.forEach((row) => {
+        if (row.customerId === Number(customerId)) {
+          const {
+            id,
+            customerId,
+            gameId,
+            rentDate,
+            daysRented,
+            returnDate,
+            originalPrice,
+            delayFee,
+            customerName,
+            gameName,
+          } = row;
+          const customer = {
+            id: customerId,
+            name: customerName,
+          };
+          const game = {
+            id: gameId,
+            name: gameName,
+          };
+          const rental = {
+            id,
+            customerId,
+            gameId,
+            rentDate,
+            daysRented,
+            returnDate,
+            originalPrice,
+            delayFee,
+            customer,
+            game,
+          };
+
+          rentals.push(rental);
+        }
+      });
+
+      return res.send(rentals);
+    }
+
+    if (gameId) {
+      result.rows.forEach((row) => {
+        if (row.gameId === Number(gameId)) {
+          const {
+            id,
+            customerId,
+            gameId,
+            rentDate,
+            daysRented,
+            returnDate,
+            originalPrice,
+            delayFee,
+            customerName,
+            gameName,
+          } = row;
+          const customer = {
+            id: customerId,
+            name: customerName,
+          };
+          const game = {
+            id: gameId,
+            name: gameName,
+          };
+          const rental = {
+            id,
+            customerId,
+            gameId,
+            rentDate,
+            daysRented,
+            returnDate,
+            originalPrice,
+            delayFee,
+            customer,
+            game,
+          };
+
+          rentals.push(rental);
+        }
+      });
+
+      return res.send(rentals);
+    }
 
     result.rows.forEach((row) => {
       const {
@@ -163,7 +251,7 @@ export async function concludeRental(req, res) {
 
 export async function deleteRental(req, res) {
   const { id } = req.params;
-  
+
   try {
     const result = await db.query(
       `SELECT rentals."returnDate", 

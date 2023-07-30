@@ -26,11 +26,20 @@ export async function createCustomer(req, res) {
 }
 
 export async function getCustomers(req, res) {
+  const { cpf } = req.query;
+
   try {
+    if (cpf) {
+      const customers = await db.query(
+        `SELECT * FROM customers WHERE cpf LIKE '${cpf}%';`
+      );
+      return res.send(customers.rows);
+    }
+
     const customers = await db.query(
       `SELECT id, name, phone, cpf, TO_CHAR(birthday, 'YYYY-MM-DD') AS birthday from customers;`
     );
-    res.send(customers.rows);
+    return res.send(customers.rows);
   } catch (err) {
     console.log(err.message);
     return res.status(500).send(err.message);
