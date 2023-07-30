@@ -56,7 +56,7 @@ export async function createRental(req, res) {
 }
 
 export async function getRentals(req, res) {
-  const { customerId, gameId, offset, limit, order, desc } = req.query;
+  const { customerId, gameId, offset, limit, order, desc, status, startDate } = req.query;
 
   try {
     let query = `SELECT rentals.id, rentals."customerId", rentals."gameId", 
@@ -79,6 +79,12 @@ export async function getRentals(req, res) {
     if (order) query += ` ORDER BY ${order}`;
 
     if (order && desc) query += ` DESC`;
+
+    if (status === "open") query += ` WHERE rentals."returnDate" = null`;
+
+    if (status === "closed") query += ` WHERE rentals."returnDate" != null`;
+
+    if (startDate) query += ` WHERE rentals."rentDate" >= ${startDate}`;
 
     const result = await db.query(query);
 
