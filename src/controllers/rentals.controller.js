@@ -96,9 +96,10 @@ export async function getRentals(req, res) {
     }
 
     if (startDate) {
+      const formattedDate = dayjs(startDate).format("YYYY-MM-DD");
       query += hasAtLeastOneCondition
-        ? ` AND WHERE rentals."rentDate" >= ${startDate}`
-        : ` WHERE rentals."rentDate" >= ${startDate}`;
+        ? ` AND WHERE rentals."rentDate" >= ${formattedDate}`
+        : ` WHERE rentals."rentDate" >= ${formattedDate}`;
       hasAtLeastOneCondition = true;
     }
 
