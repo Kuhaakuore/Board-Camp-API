@@ -83,21 +83,21 @@ export async function getRentals(req, res) {
 
     if (status === "open") {
       query += hasAtLeastOneCondition
-        ? ` AND WHERE rentals."returnDate" = null`
+        ? ` AND rentals."returnDate" = null`
         : ` WHERE rentals."returnDate" = null`;
       hasAtLeastOneCondition = true;
     }
 
     if (status === "closed") {
       query += hasAtLeastOneCondition
-        ? ` AND WHERE rentals."returnDate" != null`
+        ? ` AND rentals."returnDate" != null`
         : ` WHERE rentals."returnDate" != null`;
       hasAtLeastOneCondition = true;
     }
 
     if (startDate) {
       query += hasAtLeastOneCondition
-        ? ` AND WHERE rentals."rentDate" >= '${startDate}'`
+        ? ` AND rentals."rentDate" >= '${startDate}'`
         : ` WHERE rentals."rentDate" >= '${startDate}'`;
       hasAtLeastOneCondition = true;
     }
@@ -109,7 +109,7 @@ export async function getRentals(req, res) {
     if (order) query += ` ORDER BY "${order}"`;
 
     if (order && desc) query += ` DESC`;
-
+    
     const result = await db.query(query);
 
     const rentals = result.rows.map((row) => {

@@ -74,13 +74,6 @@ export async function editCustomerById(req, res) {
   const { name, phone, cpf, birthday } = req.body;
 
   try {
-    // const result = await db.query(
-    //   `SELECT id, name, phone, cpf, TO_CHAR(birthday, 'YYYY-MM-DD') AS birthday from customers
-    //    WHERE id = $1;`, [id]
-    // );
-
-    // if (result.rowCount === 0) res.sendStatus(404);
-
     const result = await db.query(
       `
         SELECT * from customers 
