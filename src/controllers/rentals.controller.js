@@ -69,32 +69,38 @@ export async function getRentals(req, res) {
       JOIN customers ON rentals."customerId" = customers.id
       JOIN games ON rentals."gameId" = games.id`;
 
-    let hasOneCondition = false;
+    let hasAtLeastOneCondition = false;
 
     if (customerId) {
       query += ` WHERE rentals."customerId" = ${customerId}`;
-      hasOneCondition = true;
+      hasAtLeastOneCondition = true;
     }
 
     if (gameId) {
       query += ` WHERE rentals."gameId" = ${gameId}`;
-      hasOneCondition = true;
+      hasAtLeastOneCondition = true;
     }
 
-    if (status === "open")
-      query += hasOneCondition
+    if (status === "open") {
+      query += hasAtLeastOneCondition
         ? ` AND WHERE rentals."returnDate" = null`
         : ` WHERE rentals."returnDate" = null`;
+      hasAtLeastOneCondition = true;
+    }
 
-    if (status === "closed")
-      query += hasOneCondition
+    if (status === "closed") {
+      query += hasAtLeastOneCondition
         ? ` AND WHERE rentals."returnDate" != null`
         : ` WHERE rentals."returnDate" != null`;
+      hasAtLeastOneCondition = true;
+    }
 
-    if (startDate)
-      query += hasOneCondition
+    if (startDate) {
+      query += hasAtLeastOneCondition
         ? ` AND WHERE rentals."rentDate" >= ${startDate}`
         : ` WHERE rentals."rentDate" >= ${startDate}`;
+      hasAtLeastOneCondition = true;
+    }
 
     if (offset) query += ` OFFSET ${offset}`;
 
@@ -106,43 +112,24 @@ export async function getRentals(req, res) {
 
     const result = await db.query(query);
 
-    const rentals = [];
-
-    result.rows.forEach((row) => {
-      const {
-        id,
-        customerId,
-        gameId,
-        rentDate,
-        daysRented,
-        returnDate,
-        originalPrice,
-        delayFee,
-        customerName,
-        gameName,
-      } = row;
+    const rentals = result.rows.map((row) => {
       const customer = {
         id: customerId,
-        name: customerName,
+        name: row.customerName,
       };
       const game = {
         id: gameId,
-        name: gameName,
+        name: row.gameName,
       };
       const rental = {
-        id,
-        customerId,
-        gameId,
-        rentDate,
-        daysRented,
-        returnDate,
-        originalPrice,
-        delayFee,
+        ...row,
         customer,
         game,
       };
+      delete rental.customerName;
+      delete rental.gameName;
 
-      rentals.push(rental);
+      return rental;
     });
 
     return res.send(rentals);
