@@ -26,7 +26,7 @@ export async function createGame(req, res) {
 }
 
 export async function getGames(req, res) {
-  const { name, offset, limit } = req.query;
+  const { name, offset, limit, order, desc } = req.query;
 
   try {
     let query = "SELECT * FROM games";
@@ -36,6 +36,10 @@ export async function getGames(req, res) {
     if (offset) query += ` OFFSET ${offset}`;
 
     if (limit) query += ` LIMIT ${limit}`;
+
+    if (order) query += ` ORDER BY ${order}`;
+
+    if (order && desc) query += ` DESC`;
 
     const games = await db.query(query);
     return res.send(games.rows);

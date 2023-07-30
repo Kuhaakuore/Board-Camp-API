@@ -56,7 +56,7 @@ export async function createRental(req, res) {
 }
 
 export async function getRentals(req, res) {
-  const { customerId, gameId, offset, limit } = req.query;
+  const { customerId, gameId, offset, limit, order, desc } = req.query;
 
   try {
     let query = `SELECT rentals.id, rentals."customerId", rentals."gameId", 
@@ -75,6 +75,10 @@ export async function getRentals(req, res) {
     if (offset) query += ` OFFSET ${offset}`;
 
     if (limit) query += ` LIMIT ${limit}`;
+
+    if (order) query += ` ORDER BY ${order}`;
+
+    if (order && desc) query += ` DESC`;
 
     const result = await db.query(query);
 

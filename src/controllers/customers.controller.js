@@ -26,7 +26,7 @@ export async function createCustomer(req, res) {
 }
 
 export async function getCustomers(req, res) {
-  const { cpf, offset, limit } = req.query;
+  const { cpf, offset, limit, order, desc } = req.query;
 
   try {
     let query =
@@ -37,6 +37,10 @@ export async function getCustomers(req, res) {
     if (offset) query += ` OFFSET ${offset}`;
 
     if (limit) query += ` LIMIT ${limit}`;
+
+    if (order) query += ` ORDER BY ${order}`;
+
+    if (order && desc) query += ` DESC`;
 
     const customers = await db.query(query);
     return res.send(customers.rows);
