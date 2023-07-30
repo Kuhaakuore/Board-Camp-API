@@ -38,7 +38,7 @@ export async function getCustomers(req, res) {
 
     if (limit) query += ` LIMIT ${limit}`;
 
-    if (order) query += ` ORDER BY ${order}`;
+    if (order) query += ` ORDER BY "${order}"`;
 
     if (order && desc) query += ` DESC`;
 
