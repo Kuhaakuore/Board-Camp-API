@@ -62,7 +62,7 @@ export async function getCustomerById(req, res) {
 
     if (result.rowCount === 0) res.sendStatus(404);
 
-    res.send(result.rows[0]);
+    return res.send(result.rows[0]);
   } catch (err) {
     console.log(err.message);
     return res.status(500).send(err.message);
@@ -93,7 +93,7 @@ export async function editCustomerById(req, res) {
       [id, name, phone, cpf, birthday]
     );
 
-    res.sendStatus(200);
+    return res.sendStatus(200);
   } catch (err) {
     console.log(err.message);
     return res.status(500).send(err.message);

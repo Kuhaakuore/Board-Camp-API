@@ -99,7 +99,6 @@ export async function getRentals(req, res) {
       query += hasAtLeastOneCondition
         ? ` AND rentals."rentDate" >= '${startDate}'`
         : ` WHERE rentals."rentDate" >= '${startDate}'`;
-      hasAtLeastOneCondition = true;
     }
 
     if (offset) query += ` OFFSET ${offset}`;
