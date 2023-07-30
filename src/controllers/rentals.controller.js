@@ -114,11 +114,11 @@ export async function getRentals(req, res) {
 
     const rentals = result.rows.map((row) => {
       const customer = {
-        id: customerId,
+        id: row.customerId,
         name: row.customerName,
       };
       const game = {
-        id: gameId,
+        id: row.gameId,
         name: row.gameName,
       };
       const rental = {
