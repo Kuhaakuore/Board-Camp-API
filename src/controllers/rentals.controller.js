@@ -56,107 +56,29 @@ export async function createRental(req, res) {
 }
 
 export async function getRentals(req, res) {
-  const { customerId, gameId } = req.query;
+  const { customerId, gameId, offset, limit } = req.query;
 
   try {
-    const result = await db.query(`
-    SELECT rentals.id, rentals."customerId", rentals."gameId", 
+    let query = `SELECT rentals.id, rentals."customerId", rentals."gameId", 
     rentals."daysRented", rentals."originalPrice", rentals."delayFee", 
     customers.name AS "customerName", games.name AS "gameName",
       TO_CHAR("rentDate", 'YYYY-MM-DD') AS "rentDate",
       TO_CHAR("returnDate", 'YYYY-MM-DD') AS "returnDate"
       FROM rentals
       JOIN customers ON rentals."customerId" = customers.id
-      JOIN games ON rentals."gameId" = games.id;
-    `);
+      JOIN games ON rentals."gameId" = games.id`;
+
+    if (customerId) query += ` WHERE rentals."customerId" = ${customerId}`;
+
+    if (gameId) query += ` WHERE rentals."gameId" = ${gameId}`;
+
+    if (offset) query += ` OFFSET ${offset}`;
+
+    if (limit) query += ` LIMIT ${limit}`;
+
+    const result = await db.query(query);
 
     const rentals = [];
-
-    if (customerId) {
-      result.rows.forEach((row) => {
-        if (row.customerId === Number(customerId)) {
-          const {
-            id,
-            customerId,
-            gameId,
-            rentDate,
-            daysRented,
-            returnDate,
-            originalPrice,
-            delayFee,
-            customerName,
-            gameName,
-          } = row;
-          const customer = {
-            id: customerId,
-            name: customerName,
-          };
-          const game = {
-            id: gameId,
-            name: gameName,
-          };
-          const rental = {
-            id,
-            customerId,
-            gameId,
-            rentDate,
-            daysRented,
-            returnDate,
-            originalPrice,
-            delayFee,
-            customer,
-            game,
-          };
-
-          rentals.push(rental);
-        }
-      });
-
-      return res.send(rentals);
-    }
-
-    if (gameId) {
-      result.rows.forEach((row) => {
-        if (row.gameId === Number(gameId)) {
-          const {
-            id,
-            customerId,
-            gameId,
-            rentDate,
-            daysRented,
-            returnDate,
-            originalPrice,
-            delayFee,
-            customerName,
-            gameName,
-          } = row;
-          const customer = {
-            id: customerId,
-            name: customerName,
-          };
-          const game = {
-            id: gameId,
-            name: gameName,
-          };
-          const rental = {
-            id,
-            customerId,
-            gameId,
-            rentDate,
-            daysRented,
-            returnDate,
-            originalPrice,
-            delayFee,
-            customer,
-            game,
-          };
-
-          rentals.push(rental);
-        }
-      });
-
-      return res.send(rentals);
-    }
 
     result.rows.forEach((row) => {
       const {

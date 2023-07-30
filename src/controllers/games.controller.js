@@ -26,18 +26,18 @@ export async function createGame(req, res) {
 }
 
 export async function getGames(req, res) {
-  const { name } = req.query;
+  const { name, offset, limit } = req.query;
+
   try {
+    let query = "SELECT * FROM games";
 
-    if (name) {
-      console.log(name);
-      const games = await db.query(
-        `SELECT * FROM games WHERE name ILIKE '${name}%';`
-      );
-      return res.send(games.rows);
-    }
+    if (name) query += ` WHERE name ILIKE '${name}%'`;
 
-    const games = await db.query(`SELECT * from games;`);
+    if (offset) query += ` OFFSET ${offset}`;
+
+    if (limit) query += ` LIMIT ${limit}`;
+
+    const games = await db.query(query);
     return res.send(games.rows);
   } catch (err) {
     console.log(err.message);
